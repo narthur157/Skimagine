@@ -1,24 +1,26 @@
 ﻿#pragma strict
 
+
 var cam:GameObject;
+var skiY:float;
 var camY:float;
-var turnSpeed:float = 3;
+var turnSpeed:float;
+var angle : float;
 var push : float;
-var pushVec:Vector3;
-var turn:float;
+
 function Start () {
-	turn = 0;
+	
 }
 function Update() {
-//	camY=cam.transform.eulerAngles.y;
-//	transform.eulerAngles.y = camY;
-	var turnDir:float = Input.GetAxis("Horizontal");
-	transform.eulerAngles.y += turnDir*(turnSpeed/1000.0);
+	//skiY=transform.eulerAngles.y;
+	//camY=cam.transform.eulerAngles.y;
+	//transform.eulerAngles.y = camY;
+//	transform.eulerAngles.y = 
+	
+	
 }
 function FixedUpdate () {
-	pushVec = transform.forward*push;
-	pushVec.y=0;
-	// go in the direction of the skis
-	rigidbody.AddForce(pushVec);
 
+	// go in the direction of the camera
+	rigidbody.AddForce(cam.transform.forward * push );
 }
