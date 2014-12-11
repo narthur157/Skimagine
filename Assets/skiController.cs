@@ -28,15 +28,16 @@ public class skiController : MonoBehaviour {
 		tilt = 0;
 		if (useArduino) {
 			int failCount = 0;
-			for (int i = 1; i <= 4; i++) {
-				try {
-					port = new SerialPort("COM"+i.ToString(), 9600);
-				}
-				catch (System.IO.IOException e) {
-					failCount++;
-				}
-			}
-			if (failCount == 4) Debug.LogError("Failed to open arduino...crap");
+//			for (int i = 1; i <= 4; i++) {
+//				try {
+//					port = new SerialPort("COM"+i.ToString(), 9600);
+//				}
+//				catch (System.IO.IOException e) {
+//					failCount++;
+//				}
+//			}
+//			if (failCount == 4) Debug.LogError("Failed to open arduino...crap");
+			port = new SerialPort("COM4", 9600);
 			port.Open ();
 			port.ReadTimeout = 200;
 		}
@@ -45,7 +46,7 @@ public class skiController : MonoBehaviour {
 		float skiDeltaY = 0;
 		if (useArduino) {
 			if (port.BytesToRead > 0) {
-				tilt = ReadData ();		
+//				tilt = ReadData ();		
 			}
 		}
 		else {
@@ -78,7 +79,7 @@ public class skiController : MonoBehaviour {
 		string rxString = "";
 		
 		tmpByte = (string) port.ReadLine();
-		return (float) Convert.ToDouble (tmpByte);
+		return (float) Convert.ToDouble (Convert.ToByte (tmpByte));
 		//        while (tmpByte != 255) {
 		//            rxString += ((char) tmpByte);
 		//            tmpByte = (byte) mySerial.ReadByte();
