@@ -23,6 +23,7 @@ public class skiController : MonoBehaviour {
 	public float maxZXVelocity = 10;
 	public int speed = 1000;
 	public GameObject cam;
+	public Vector3 velocity;
 	void Start () {
 		tilt = 0;
 		if (useArduino) {
@@ -51,7 +52,7 @@ public class skiController : MonoBehaviour {
 			tilt = Input.GetAxis("Horizontal");
 		}
 
-		skiDeltaY += (float)(tilt * (turnSpeed / turnSpeedFactorReduction));
+		skiDeltaY += (float)(tilt * (turnSpeed));// / turnSpeedFactorReduction));
 		Vector3 ang = transform.eulerAngles;
 		ang.y += skiDeltaY;
 
@@ -59,24 +60,17 @@ public class skiController : MonoBehaviour {
 
 		Vector3 vel = rigidbody.velocity;
 		float total = rigidbody.velocity.x + rigidbody.velocity.z;
-		float zxMag = total / 2;
+		float zxMag = rigidbody.velocity.magnitude;
 		if (zxMag >= maxZXVelocity) {
-			// percent of the two original velocities
-			float xPercent = rigidbody.velocity.x / total;
-			float zPercent = rigidbody.velocity.z / total;
-			// xPercent + zPercent should be 1. Therefore (xPercent+zPercent)*zxMag=zxMag and we'll be at the max velocity
-			// log the output if it isn't 1
-			if (xPercent + zPercent != 1.0) Debug.LogError("xPercent plus zPercent should be 1, it is " + (xPercent+zPercent).ToString ());
-			vel.x = xPercent * zxMag;
-			vel.z = zPercent * zxMag;
-			rigidbody.velocity = vel;
+			rigidbody.velocity = vel.normalized * maxZXVelocity;
 		}
+		velocity = rigidbody.velocity;
 	}
 	void FixedUpdate () {
 		
 		// go in the direction of the camera
-		rigidbody.AddForce(cam.transform.forward * speed );
-		rigidbody.AddForce (transform.forward * speed);
+		//rigidbody.AddForce(cam.transform.forward * speed );
+		rigidbody.AddForce(transform.forward * speed);
 	}
 	public float  ReadData()
 	{
