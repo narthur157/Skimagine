@@ -21,15 +21,17 @@ void setup() {
 void loop() { 
   
   sixDOF.getEuler(angles);
-  if(angles[2] > 95) {
+  int lowerBound = 79;
+  int upperBound = 115;
+  if(angles[2] > upperBound) {
     Serial.println(1);
   }
-    if(angles[2] < 89) {
+    if(angles[2] < lowerBound) {
       Serial.println(-1);
     }
-      if(95 > angles[2] && angles[2] > 89) {
-        Serial.println(0);
-      }
+  if(upperBound > angles[2] && angles[2] > lowerBound) {
+  	Serial.println(0);
+  }
   delay(100); 
 }
 
