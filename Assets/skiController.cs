@@ -47,7 +47,9 @@ public class skiController : MonoBehaviour {
 		if (useArduino) {
 			try {
 				tilt = ReadData ();		
-				if (tilt != 0) tilt *= -1;
+				//if (tilt != 0) tilt *= -1;
+				if (tilt > 0) tilt = 1;
+				if (tilt < 0) tilt = -1;
 			}
 			catch (Exception e) {}
 		}
