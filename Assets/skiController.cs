@@ -9,8 +9,7 @@ public class skiController : MonoBehaviour {
 	public double tilt;
 	// for the skis
 	public double turnSpeed = 3;
-	// false, use keyboard, true use accelerometer
-	public bool useArduino = false;
+	public float turnStrength = .86f;
 	// the arduino
 	public SerialPort port;
 	// how much does the direction the camera is facing contribute to where we go
@@ -24,39 +23,12 @@ public class skiController : MonoBehaviour {
 	public int speed = 1000;
 	public GameObject cam;
 	public Vector3 velocity;
-	void Start () {
-		tilt = 0;
-		if (useArduino) {
-			int failCount = 0;
-			for (int i = 1; i <= 4; i++) {
-				try {
-					port = new SerialPort("COM"+i.ToString(), 9600);
-					port.Open ();
-					break;
-				}
-				catch (Exception e) {
-					failCount++;
-				}
-			}
-			if (failCount == 4) Debug.LogError("Failed to open arduino...crap");
-			port.ReadTimeout = 1;
-		}
-	}
+	public Vector3 localVel;
 	void Update () {
 		float skiDeltaY = 0;
-		if (useArduino) {
-			try {
-				tilt = ReadData ();		
-				//if (tilt != 0) tilt *= -1;
-				if (tilt > 0) tilt = 1;
-				if (tilt < 0) tilt = -1;
-			}
-			catch (Exception e) {}
-		}
-		else {
-			tilt = Input.GetAxis("Horizontal");
-		}
 
+		tilt = Input.GetAxis("Horizontal");
+		bool boost = Input.GetButtonDown("Boost");
 		skiDeltaY += (float)(tilt * (turnSpeed));// / turnSpeedFactorReduction));
 		Vector3 ang = transform.eulerAngles;
 		ang.y += skiDeltaY;
@@ -67,27 +39,23 @@ public class skiController : MonoBehaviour {
 		float total = rigidbody.velocity.x + rigidbody.velocity.z;
 		float zxMag = rigidbody.velocity.magnitude;
 		if (zxMag >= maxZXVelocity) {
-			rigidbody.velocity = vel.normalized * maxZXVelocity;
+			vel = vel.normalized * maxZXVelocity;
 		}
 		velocity = rigidbody.velocity;
+		// the further our skis are tilted away from our velocity, the faster we want to dampen that velocity
+		// how to calculate rotational distance between a velocity 
+		localVel = transform.InverseTransformDirection (vel);
+		//rigidbody.drag = Math.Abs (transform.InverseTransformDirection(rigidbody.velocity).x) * (float)turnStrength;
+		//transform.InverseTransformDirection(rigidbody.velocity)
+		localVel.x -= localVel.x * turnStrength;
+
+		if (boost) localVel.z += 4;
+
+		rigidbody.velocity = transform.TransformDirection(localVel);
 	}
 	void FixedUpdate () {
-		
 		// go in the direction of the camera
 		//rigidbody.AddForce(cam.transform.forward * speed );
 		rigidbody.AddForce(transform.forward * speed);
-	}
-	public float  ReadData()
-	{
-		string tmpByte;
-		string rxString = "";
-		tmpByte = port.ReadLine();
-		return (float)Convert.ToDouble(tmpByte);
-		//        while (tmpByte != 255) {
-		//            rxString += ((char) tmpByte);
-		//            tmpByte = (byte) mySerial.ReadByte();
-		//        }
-		// 
-		//        return rxString;
 	}
 }
